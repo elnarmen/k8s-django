@@ -1,0 +1,25 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: django-migrate
+  labels:
+    app.kubernetes.io/name: django
+spec:
+  backoffLimit: 4
+  activeDeadlineSeconds: 90
+  ttlSecondsAfterFinished: 100
+  template:
+    spec:
+      containers:
+      - name: django-migrate-container
+        imagePullPolicy: Never
+        envFrom:
+          - configMapRef:
+              name: django-configmap
+        image: k8s-django:latest
+        command:
+          - python3
+          - manage.py
+          - migrate
+          - --no-input
+      restartPolicy: Never

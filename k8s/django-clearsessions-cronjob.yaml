@@ -25,3 +25,4 @@ spec:
               - manage.py
               - clearsessions
           restartPolicy: OnFailure
+          startingDeadlineSeconds: 90

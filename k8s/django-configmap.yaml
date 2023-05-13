@@ -4,6 +4,6 @@ metadata:
   name: django-configmap
 data:
   ALLOWED_HOSTS: '*'
-  DATABASE_URL: 'postgres://test_k8s:OwOtBep9Frut@10.244.0.119:5432/test_k8s'
+  DATABASE_URL: 'postgres://test_k8s:OwOtBep9Frut@10.244.0.134:5432/test_k8s'
   DEBUG: 'False'
   SECRET_KEY: 'lmdleft'
