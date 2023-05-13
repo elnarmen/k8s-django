@@ -18,15 +18,9 @@ spec:
       - name: django-container
         image: k8s-django:latest
         imagePullPolicy: Never
-        env:
-          - name: DEBUG
-            value: "False"
-          - name: SECRET_KEY
-            value: "lmdleft"
-          - name: DATABASE_URL
-            value: "postgres://test_k8s:OwOtBep9Frut@10.244.0.9:5432/test_k8s"
-          - name: ALLOWED_HOSTS
-            value: "*"
+        envFrom:
+          - configMapRef:
+              name: django-configmap
 ---
 apiVersion: v1
 kind: Service
