@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: django-deployment
+  labels:
+    app.kubernetes.io/name: django
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: django
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: django
+    spec:
+      containers:
+      - name: django-container
+        image: k8s-django:latest
+        imagePullPolicy: Never
+        env:
+          - name: DEBUG
+            value: "False"
+          - name: SECRET_KEY
+            value: "lmdleft"
+          - name: DATABASE_URL
+            value: "postgres://test_k8s:OwOtBep9Frut@10.244.0.9:5432/test_k8s"
+          - name: ALLOWED_HOSTS
+            value: "*"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: django-service
+spec:
+  selector:
+    app.kubernetes.io/name: django
+  ports:
+    - name: app-listener
+      port: 80

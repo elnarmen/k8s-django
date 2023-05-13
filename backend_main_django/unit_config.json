@@ -36,7 +36,7 @@
             "path":"/code/",
             "module":"project.wsgi",
             "environment": {
-                "DJANGO_SETTINGS_MODULE": "project.settings",
+                "DJANGO_SETTINGS_MODULE": "project.settings"
             }
         }
     }

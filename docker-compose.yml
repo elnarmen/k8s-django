@@ -5,6 +5,8 @@ services:
     image: postgres:12.0-alpine
     volumes:
       - db_data:/var/lib/postgresql/data
+    ports:
+      - "31.223.112.176:5432:5432"
     environment:
       POSTGRES_DB: ${POSTGRES_DB-test_k8s}
       POSTGRES_USER: ${POSTGRES_USER-test_k8s}
@@ -17,7 +19,7 @@ services:
       - ./backend_main_django:/code
     environment: 
       SECRET_KEY: ${WEB_SECRET_KEY-REPLACE_ME}
-      DEBUG: ${WEB_DEBUG-TRUE}
+      DEBUG: ${WEB_DEBUG-FALSE}
       DATABASE_URL: ${WEB_DATABASE_URL-postgres://test_k8s:OwOtBep9Frut@db:5432/test_k8s}
       ALLOWED_HOSTS: ${WEB_ALLOWED_HOSTS-127.0.0.1,localhost}
     ports:
