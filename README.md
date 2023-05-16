@@ -20,7 +20,89 @@ $ docker-compose run web ./manage.py createsuperuser
 ```
 
 Для тонкой настройки Docker Compose используйте переменные окружения. Их названия отличаются от тех, что задаёт docker-образа, сделано это чтобы избежать конфликта имён. Внутри docker-compose.yaml настраиваются сразу несколько образов, у каждого свои переменные окружения, и поэтому их названия могут случайно пересечься. Чтобы не было конфликтов к названиям переменных окружения добавлены префиксы по названию сервиса. Список доступных переменных можно найти внутри файла [`docker-compose.yml`](./docker-compose.yml).
+## Разертывание с помощью Minikube
+Перед началом работы убедитесь что у вас установлены следующие инструменты:
+* Инструмент для управления кластерами Kubernetes: [Kubectl](https://kubernetes.io/ru/docs/tasks/tools/install-kubectl/). 
+* [Minikube](https://minikube.sigs.k8s.io/docs/)<br>
 
+Если используете Linux, то этого достаточно. Можете запускать minikube:
+```
+minikube start --driver=docker
+```
+Для Windows необходимо установить гипервизор. Например, [virtualbox](https://www.virtualbox.org/wiki/Downloads).
+В таком случае, команда для запуска minikube будет выглядеть следующим образом:
+```
+minikube start --driver=virtualbox
+```
+### Настройка и запуск базы данных
+* Создайте файл `values.yaml` в директории проекта и заполните его по шаблону:
+```
+auth:
+  enablePostgresUser: true
+  postgresPassword: {your database password}
+  username: {your username}
+  password: {your user`s password}
+  database: {your database`s name}
+```
+* Установите пакетный менеджер для Kubernetes - [Helm](https://helm.sh/)
+Выполните следующие команды:
+```
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm install postgres -f values.yaml bitnami/postgresql
+```
+Helm установит и запустит postgresql, а также создаст пользователя по параметрам, указанным в `values.yaml`.
+
+### Настройка и запуск Django
+* Создайте образ Django-приложения в кластере:
+```
+minikube image build -t ks8-django backend_main_django/
+```
+* Задайте нужные значения переменных окружения в файле конфигурации `k8s/django-configmap.yaml`:
+```
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: django-configmap
+data:
+  ALLOWED_HOSTS: '*'
+  DATABASE_URL: postgres://user_name:password@postgres:5432/db_name
+  DEBUG: 'False'
+  SECRET_KEY: your-secret-key
+```
+В DATABASE_URL укажите данные в формате `postgres://username:password@postgres:5432/database_name`, где username, password, database_name - данные из файла `values.yaml`
+* Запустите `ConfigMap` командой:
+```
+kubectl apply -f k8s/django-configmap.yaml
+```
+* Запустите деплой:
+```
+kubectl apply -f k8s/deployment.yaml
+```
+* Запустите миграции:
+```
+kubectl apply -f k8s/django-migrate-job.yaml
+```
+* Создайте kron службу для очистки устаревших сессий:
+```
+kubectl apply -f k8s/django-clearsessions-cronjob.yaml
+```
+### Настройка Ingress
+* В папке `/etc/hosts` добавьте строку:
+```
+minikube-ip-address star-burger.test
+```
+* Чтобы узнать IP-адрес minikube запустите команду:
+```
+minikube ip
+```
+* Включите Ingress Controller:
+```
+minikube addons enable ingress
+```
+* Запустите Ingress манифест:
+```
+kubectl apply -f k8s/ingress.yml
+```
 ## Переменные окружения
 
 Образ с Django считывает настройки из переменных окружения:
