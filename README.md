@@ -57,23 +57,27 @@ Helm установит и запустит postgresql, а также созда
 ```
 minikube image build -t ks8-django backend_main_django/
 ```
-* Задайте нужные значения переменных окружения в файле конфигурации `k8s/django-configmap.yaml`:
+* Задайте нужные значения переменных окружения в файле конфигурации `k8s/django-secret.yaml`:
 ```
 apiVersion: v1
-kind: ConfigMap
+kind: Secret
 metadata:
-  name: django-configmap
-data:
-  ALLOWED_HOSTS: '*'
-  DATABASE_URL: postgres://user_name:password@postgres:5432/db_name
+  name: django-secret
+stringData:
+  ALLOWED_HOSTS: ['*']
+  DATABASE_URL: 'postgres://user_name:password@db_host:5432/db_name'
   DEBUG: 'False'
-  SECRET_KEY: your-secret-key
+  SECRET_KEY: 'your-secret-key'
+
 ```
 В DATABASE_URL укажите данные в формате `postgres://username:password@postgres:5432/database_name`, где username, password, database_name - данные из файла `values.yaml`
 * Запустите `ConfigMap` командой:
 ```
-kubectl apply -f k8s/django-configmap.yaml
+kubectl apply -f k8s/django-secret.yaml
 ```
+Значения переменных будут автоматически закодированы в формат `base64` при запуске конфига `django-secret`
+
+
 * Запустите деплой:
 ```
 kubectl apply -f k8s/deployment.yaml
