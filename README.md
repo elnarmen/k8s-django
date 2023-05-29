@@ -101,7 +101,7 @@ minikube addons enable ingress
 ```
 * Запустите Ingress манифест:
 ```
-kubectl apply -f k8s/ingress.yml
+kubectl apply -f k8s/ingress.yaml
 ```
 ## Переменные окружения
 

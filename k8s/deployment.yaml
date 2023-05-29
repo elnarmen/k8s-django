@@ -19,8 +19,8 @@ spec:
         image: k8s-django:latest
         imagePullPolicy: Never
         envFrom:
-          - configMapRef:
-              name: django-configmap
+          - secretRef:
+              name: django-secret
 ---
 apiVersion: v1
 kind: Service
