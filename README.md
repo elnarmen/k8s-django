@@ -71,7 +71,7 @@ stringData:
 
 ```
 В DATABASE_URL укажите данные в формате `postgres://username:password@postgres:5432/database_name`, где username, password, database_name - данные из файла `values.yaml`
-* Запустите `ConfigMap` командой:
+* Запустите конфиг командой:
 ```
 kubectl apply -f k8s/django-secret.yaml
 ```
