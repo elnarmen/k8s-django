@@ -5,6 +5,7 @@ metadata:
   labels:
     app.kubernetes.io/name: django
 spec:
+  ttlSecondsAfterFinished: 100
   schedule: "0 0 1 * *"
   jobTemplate:
     spec:
